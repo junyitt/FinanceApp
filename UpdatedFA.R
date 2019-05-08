@@ -58,12 +58,12 @@ server <- function(input, output) {
   })
   v <- reactiveValues(data = NULL)
   observeEvent(input$action, {
-    v$data <- seq(0,input$range,by=2)
+    v$data <- saving_proj(input$numInput,input$AIR,input$range)
   })
   
   output$plot <- renderPlot({
     if (is.null(v$data)) return()
-    hist(v$data)
+  plot(x=c(0:(length(v$data)-1)),y=v$data,type='l',ylab='Savings in RM',xlab='Year',main=paste('Projection of Savings over',input$range,' years'))
   })
   
 }

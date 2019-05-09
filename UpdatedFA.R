@@ -24,10 +24,17 @@ ui <- fluidPage(
       numericInput("growth_duration",
                    "Duration needed for each increments in years:",
                    value = 2),
+      numericInput("promo_rate",
+                   "Enter your increment rate for promotion:",
+                   value = 10),
+      numericInput("promo_time",
+                   "Duration for promotion:",
+                   value = 5),
       numericInput("numInput",
                    "Enter your yearly saving at the end of the month
                    in RM:",
                    value = 1000),
+  
       numericInput("AIR",
                    "Enter the current interest rate in %:",
                    value = 5),

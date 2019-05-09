@@ -15,7 +15,8 @@ return(data)
 #saving_proj(1000,5,30)
 
 #income_proj(3000,5,2,5)
-income_proj<-function(income,r,year,n){
+income_proj<-function(income,r,year,n,pr,p){
+  if(missing(p) & missing(pr)){
   data<-rep(0,(n%/%year)+1)
   init=income
   data[1]<-income
@@ -24,5 +25,10 @@ income_proj<-function(income,r,year,n){
     data[i+1]<-init
   }
   return(data)
+  }
+  else{
+    
+  }
 }
 income_proj(3000,5,2,10)
+

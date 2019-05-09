@@ -15,6 +15,15 @@ ui <- fluidPage(
                               "Rental", 
                               "Loan"),
                   selected = "Food"),
+      numericInput("init_income",
+                   "Enter your initial income:",
+                   value = 3000),
+      numericInput("growth_rate",
+                   "Enter the expected income growth rate in %:",
+                   value = 5),
+      numericInput("growth_duration",
+                   "Duration needed for each increments in years:",
+                   value = 2),
       numericInput("numInput",
                    "Enter your yearly saving at the end of the month
                    in RM:",
@@ -24,7 +33,7 @@ ui <- fluidPage(
                    value = 5),
       sliderInput("range", 
                  label = "Years of Saving:",
-               min = 1, max = 50, value = 30),
+               min = 1, max = 50, value = 10),
       hr(),
       actionButton("action","Saving Projection"),
       
@@ -35,7 +44,11 @@ ui <- fluidPage(
     textOutput("txtOutput"),
     textOutput("AIRout"),
     textOutput("FV"),
-    plotOutput("plot")
+    textOutput("init_income_out"),
+    textOutput("growth_rate_out"),
+    textOutput("duration_out"),
+    plotOutput("plot_saving"),
+    plotOutput("plot_income")
       
     #)
   #)
@@ -56,14 +69,29 @@ server <- function(input, output) {
   output$AIRout <- renderText({
     paste("Your annual rate of return is: ", input$AIR,"%")
   })
+  output$init_income_out <- renderText({ 
+    paste("Your initial income is RM", input$init_income)
+  })
+  output$growth_rate_out <- renderText({ 
+    paste("Your income growth rate is", input$growth_rate,"%")
+  })
+  output$duration_out <- renderText({ 
+    paste("Your income growth rate is", input$growth_duration,"%")
+  })
   v <- reactiveValues(data = NULL)
   observeEvent(input$action, {
     v$data <- saving_proj(input$numInput,input$AIR,input$range)
+    v$incomedata <- income_proj(input$init_income,input$growth_rate,input$growth_duration,input$range)
+    #input$init_income,input$growth_rate,input$growth_duration,input$range
   })
   
-  output$plot <- renderPlot({
+  output$plot_saving <- renderPlot({
     if (is.null(v$data)) return()
   plot(x=c(0:(length(v$data)-1)),y=v$data,type='l',ylab='Savings in RM',xlab='Year',main=paste('Projection of Savings over',input$range,' years'))
+  })
+  output$plot_income <- renderPlot({
+    if (is.null(v$incomedata)) return()
+    plot(x=seq(0,(length(v$incomedata)-1)*input$growth_duration,by=input$growth_duration),y=v$incomedata,type='l',ylab='Income Projection in RM',xlab='Year',main=paste('Projection of Income over',input$range,' years'))
   })
   
 }

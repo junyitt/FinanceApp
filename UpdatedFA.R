@@ -1,5 +1,6 @@
 library(shiny)
 library(DT)
+library(plotly)
 source("./function.R")
 
 ui <- fluidPage(
@@ -65,7 +66,8 @@ ui <- fluidPage(
   textOutput("growth_rate_out"),
   textOutput("duration_out"),
   plotOutput("plot_saving"),
-  plotOutput("plot_income")
+  plotOutput("plot_income"),
+  plotOutput("timeseries")
   
   #)
   #)
@@ -74,6 +76,7 @@ ui <- fluidPage(
 
 server <- function(input, output) {
 
+  res<-reactiveValues(df=data.frame())
   
   output$selected_var <- renderText({ 
     paste("You have selected", input$var)
@@ -100,11 +103,12 @@ server <- function(input, output) {
   observeEvent(input$action, {
     v$data <- saving_proj(input$numInput,input$AIR,input$range)
     v$incomedata <- income_proj(input$init_income,input$growth_rate,input$growth_duration,input$range)
+    res$df <- final_df(as.numeric(input$age),as.numeric(input$range),as.numeric(input$age_m),as.numeric(input$growth_rate),as.numeric(input$growth_duration),as.numeric(input$promo_rate),as.numeric(input$promo_time),as.numeric(input$init_income))
     #input$init_income,input$growth_rate,input$growth_duration,input$range
   })
-
   output$mytable = DT::renderDataTable({
-    final_df(as.numeric(input$age),as.numeric(input$range),as.numeric(input$age_m),as.numeric(input$growth_rate),as.numeric(input$growth_duration),as.numeric(input$promo_rate),as.numeric(input$promo_time))
+    # final_df(as.numeric(input$age),as.numeric(input$range),as.numeric(input$age_m),as.numeric(input$growth_rate),as.numeric(input$growth_duration),as.numeric(input$promo_rate),as.numeric(input$promo_time),as.numeric(input$init_income))
+    res$df
   })
   output$plot_saving <- renderPlot({
     if (is.null(v$data)) return()
@@ -112,8 +116,14 @@ server <- function(input, output) {
   })
   output$plot_income <- renderPlot({
     if (is.null(v$incomedata)) return()
-    plot(x=seq(0,(length(v$incomedata)-1)*input$growth_duration,by=input$growth_duration),y=v$incomedata,type='l',ylab='Income Projection in RM',xlab='Year',main=paste('Projection of Income over',input$range,' years'))
+    
+    # result$date<-reactiveValues(res$date)
+    # result$income_p<-reactiveValues(res$proj_income)
+    df <- res$df
+    plot_ly(x=df$date,y=df$proj_income,mode='lines',type='scatter')
+  # plot(x=df$date,y=df$proj_inc,type='l',ylab='Income Projection in RM',xlab='Age_month',main=paste('Projection of Income over',input$range,' years'))
   })
+
   
 }
 

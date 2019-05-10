@@ -31,7 +31,7 @@ income_proj<-function(income,r,year,n,pr,p){
   }
 }
 income_proj(3000,5,2,10)
-final_df<-function(age,n,month,ir,growth_d,pr,pt){
+final_df<-function(age,n,month,ir,growth_d,pr,pt,init_inc){
   age_c<-c(age:(age+n))
   age_ot<-c(rep(age_c[1],times=(12-month)),rep(age_c[2:length(age_c)],rep(12,(length(age_c)-1))))
   age_ot<-age_ot[1:(n*12)]
@@ -40,23 +40,37 @@ final_df<-function(age,n,month,ir,growth_d,pr,pt){
   #print(age_ot)
   #print(month_ot)
   ####
-  growth_r<-rep(0,12*n)
   temp<-n%/%growth_d
-  temp_1<-c(1:temp)
-  temp_2<-temp_1*12*growth_d
-  growth_r[temp_2]<-ir
+  r<-ir
+  temp_1<-c(0:temp)
+  #print(temp_1)
+  temp_2<-sapply(temp_1,function(x){ return ((1+ir/100)**x)})
+  temp_3<-rep(temp_2,each=(growth_d*12))
+  growth_r<-temp_3[1:(n*12)]
   #print(length(growth_r))
   ##
-  promo_r<-rep(0,12*n)
   temp_p<-n%/%pt
-  temp_p_1<-c(1:temp_p)
-  temp_p_2<-temp_p_1*12*pt
-  promo_r[temp_p_2]<-pr
+  r<-pr
+  temp_p_1<-c(0:temp_p)
+  temp_p_2<-sapply(temp_p_1,function(x){return ((1+pr/100)**x)})
+  temp_p_3<-rep(temp_p_2,each=(pt*12))
+  promo_r<-temp_p_3[1:(n*12)]
   ##
-
+  init_income<-rep(init_inc,n*12)
+  
+  combine_r<-growth_r*promo_r
+  proj_income<-init_income*combine_r
+  #print(age_ot)
+ # print(month_ot)
+  date<-paste(age_ot,month_ot,sep='-')
+  #print(combine_r)
+#  print(date)
   ##
-  age_df<-data.frame(age_ot,month_ot,growth_r,promo_r)
+  age_df<-data.frame(date,age_ot,month_ot,growth_r,promo_r,combine_r,proj_income)
   return(age_df)
 }
-
+x<-final_df(20,11,0,5,2,10,5,3000)
+access_df<-function(df,x){
+  return(df[x])
+}
 

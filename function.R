@@ -9,7 +9,7 @@ saving_proj<-function(p,r,n){
   data<-seq(1,n)
   # print(data)
   future_val2<-function(x){
-    returnValue(initmoney*(((1+rate/100)**x)-1)/(rate/100))
+    returnValue(round(initmoney*(((1+rate/100)**x)-1)/(rate/100),2))
     
   }
   

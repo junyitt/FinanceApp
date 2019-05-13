@@ -8,12 +8,20 @@ ui <- fluidPage(
   titlePanel("Financial Calculator"),
   helpText("Help you calculate your income"),
   selectInput("var", 
-              label = "Choose your expenses",
-              choices = c("Petrol", 
-                          "Food",
-                          "Rental", 
-                          "Loan"),
-              selected = "Food"),
+              label = "Choose monthly/yearly saving deposit",
+              choices = c("Monthly", 
+                          "Yearly"
+                         ),
+              selected = "Yearly"),
+  numericInput("numInput",
+               'Enter your yearly/monthly savings at the end of the year/month in RM:',
+               value = 1000),
+  sliderInput("range", 
+              label = "Years of Saving:",
+              min = 1, max = 50, value = 10),
+  numericInput("AIR",
+               "Enter the current interest rate in %:",
+               value = 5),
   numericInput("age",
                "Input your current age:",
                value = 20),
@@ -36,17 +44,10 @@ ui <- fluidPage(
   numericInput("promo_time",
                "Duration for promotion:",
                value = 5),
-  numericInput("numInput",
-               "Enter your yearly saving at the end of the month
-               in RM:",
-               value = 1000),
+
   
-  numericInput("AIR",
-               "Enter the current interest rate in %:",
-               value = 5),
-  sliderInput("range", 
-              label = "Years of Saving:",
-              min = 1, max = 50, value = 10),
+
+
   #textOutput("Income Projection"),
   DT::dataTableOutput("mytable"),
   hr(),
@@ -109,8 +110,16 @@ server <- function(input, output) {
   })
   v <- reactiveValues(data = NULL)
   observeEvent(input$action, {
-
-    sav$dfs <- saving_proj(input$numInput,input$AIR,input$range)
+    if (input$var == 'Monthly'){
+        interest<-input$AIR/12
+        range <- input$range*12
+    }
+    else{
+      interest<-input$AIR
+      range<-input$range
+    }
+    # print(interest)
+    sav$dfs <- saving_proj(input$numInput,interest,range)
 
     v$data <- saving_proj(input$numInput,input$AIR,input$range)
     v$incomedata <- income_proj(input$init_income,input$growth_rate,input$growth_duration,input$range)
@@ -130,12 +139,19 @@ server <- function(input, output) {
   output$plot_saving <- renderPlotly({
     if (is.null(v)) return()
     df_save<-sav$dfs
+    # print(df_save)
+    if (input$var == 'Monthly'){
+      title_1<-'Months'
+    }
+    else{
+      title_1<-'Years'
+    }
     plot_ly(df_save,x=df_save$year,y=df_save$data,type='scatter',mode='lines')%>%
       layout(
         title = paste('Saving Projection for',input$range, "years in RM"),
         xaxis = list(
           # type = 'category',
-          title = 'Year'
+          title = title_1
         ),
         yaxis = list(
           title = 'Saving Projection in RM'

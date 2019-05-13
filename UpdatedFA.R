@@ -157,7 +157,6 @@ server <- function(input, output) {
     b<-list(
       title="Time in Age-Months"
     )
-    print(df)
     plot_ly(df, x = df$date, y = df$proj_income,type='scatter',mode='lines')%>%
       layout(
         title = paste('Income Projection for',input$range, "years in RM"),

@@ -3,7 +3,6 @@ future_val<-function(p,r,n){
 
 }
 saving_proj<-function(p,r,n){
-<<<<<<< HEAD
   initmoney<-p
   rate<-r
   num<-n
@@ -23,7 +22,7 @@ saving_proj<-function(p,r,n){
   # }
   year<-c(1:(length(data_res)))
   return(data.frame(year,data_res))
-=======
+
   data<-rep(0,n+1)
   init=0
   for (i in 1:n){
@@ -31,13 +30,11 @@ saving_proj<-function(p,r,n){
     data[i+1]<-init
   }
   return(data)
->>>>>>> upstream/master
 }
 #plot(data,type='l')
 #saving_proj(1000,5,30)
 
 #income_proj(3000,5,2,5)
-<<<<<<< HEAD
 # income_proj<-function(income,r,year,n,pr,p){
 #   if(missing(p) & missing(pr)){
 #     data<-rep(0,(n%/%year)+1)
@@ -54,7 +51,6 @@ saving_proj<-function(p,r,n){
 #   }
 # }
 # income_proj(3000,5,2,10)
-=======
 income_proj<-function(income,r,year,n,pr,p){
   if(missing(p) & missing(pr)){
     data<-rep(0,(n%/%year)+1)
@@ -71,7 +67,6 @@ income_proj<-function(income,r,year,n,pr,p){
   }
 }
 income_proj(3000,5,2,10)
->>>>>>> upstream/master
 final_df<-function(age,n,month,ir,growth_d,pr,pt,init_inc){
   age_c<-c(age:(age+n))
   age_ot<-c(rep(age_c[1],times=(12-month)),rep(age_c[2:length(age_c)],rep(12,(length(age_c)-1))))
@@ -107,7 +102,7 @@ final_df<-function(age,n,month,ir,growth_d,pr,pt,init_inc){
   #print(combine_r)
 #  print(date)
   ##
-  age_df<-data.frame(date,age_ot,month_ot,growth_r,promo_r,combine_r,proj_income)
+  age_df<-data.frame(as.character(date),age_ot,month_ot,growth_r,promo_r,combine_r,proj_income)
   return(age_df)
 }
 x<-final_df(20,11,0,5,2,10,5,3000)

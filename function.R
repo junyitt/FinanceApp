@@ -1,8 +1,28 @@
 future_val<-function(p,r,n){
   returnValue(p*(((1+r/100)**n)-1)/(r/100))
-  
+
 }
 saving_proj<-function(p,r,n){
+  initmoney<-p
+  rate<-r
+  num<-n
+  data<-seq(1,n)
+  # print(data)
+  future_val2<-function(x){
+    returnValue(round(initmoney*(((1+rate/100)**x)-1)/(rate/100),2))
+    
+  }
+  
+
+  data_res<-sapply(data,future_val2)
+  # init=0
+  # for (i in 1:n){
+  #   init=future_val(p,r,i)
+  #   data[i+1]<-init
+  # }
+  month<-c(1:(length(data_res)))
+  return(data.frame(month,data_res))
+
   data<-rep(0,n+1)
   init=0
   for (i in 1:n){
@@ -15,6 +35,22 @@ saving_proj<-function(p,r,n){
 #saving_proj(1000,5,30)
 
 #income_proj(3000,5,2,5)
+# income_proj<-function(income,r,year,n,pr,p){
+#   if(missing(p) & missing(pr)){
+#     data<-rep(0,(n%/%year)+1)
+#     init=income
+#     data[1]<-income
+#     for (i in 1:(n%/%year)){
+#       init=init*(1+(r/100))
+#       data[i+1]<-init
+#     }
+#     return(data)
+#   }
+#   else{
+#     
+#   }
+# }
+# income_proj(3000,5,2,10)
 income_proj<-function(income,r,year,n,pr,p){
   if(missing(p) & missing(pr)){
     data<-rep(0,(n%/%year)+1)
@@ -66,7 +102,7 @@ final_df<-function(age,n,month,ir,growth_d,pr,pt,init_inc){
   #print(combine_r)
 #  print(date)
   ##
-  age_df<-data.frame(date,age_ot,month_ot,growth_r,promo_r,combine_r,proj_income)
+  age_df<-data.frame(as.character(date),age_ot,month_ot,growth_r,promo_r,combine_r,proj_income)
   return(age_df)
 }
 x<-final_df(20,11,0,5,2,10,5,3000)

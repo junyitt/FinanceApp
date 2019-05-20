@@ -110,3 +110,38 @@ access_df<-function(df,x){
   return(df[x])
 }
 
+
+
+## Convert monthly savings to the necessary Age-Month-Savings DF
+monthly_saving_df_convert <- function(age, month, n, month_df){
+    age_c<-c(age:(age+n))
+    age_ot<-c(rep(age_c[1],times=(12-month)),rep(age_c[2:length(age_c)],rep(12,(length(age_c)-1))))
+    age_ot<-age_ot[1:(n*12)]
+    month_ot<- c(month:11,rep(c(0:11),(length(age_c)-1)))
+    month_ot<-month_ot[1:(n*12)]
+    proj <- month_df$Projection[1:length(month_ot)]
+    df <- data.frame(Age = age_ot, Month = month_ot, FDSavings = proj) %>% na.fill(0)
+    return(df)
+    
+}
+
+yearly_saving_df_convert <- function(age, month, n, year_df){
+    age_c<-c(age:(age+n))
+    age_ot<-c(rep(age_c[1],times=(12-month)),rep(age_c[2:length(age_c)],rep(12,(length(age_c)-1))))
+    age_ot<-age_ot[1:(n*12)]
+    month_ot<- c(month:11,rep(c(0:11),(length(age_c)-1)))
+    month_ot<-month_ot[1:(n*12)]
+    
+    projections <- c(sapply(year_df$Projection, FUN = function(j){
+        rep(j,12)
+    }))[1:length(month_ot)]
+    df <- data.frame(Age = age_ot, Month = month_ot, FDSavings = projections) %>% na.fill(0)
+    return(df)
+    
+}
+
+
+
+
+
+# monthly_saving_df_convert(20, 2, 50, NULL)

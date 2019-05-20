@@ -83,29 +83,7 @@ graphHigh <- plot_ly(cHighTab,x = cHighTab$Age,y = cHighTab$livingCost,mode = "l
                      yaxis = list(title = "Living Cost",titlefont = list(size = 13),showline = T,linecolor = "rgb(235,235,235)",range = c(0,160000),mirror = T)
                      )
 
-#For showing the cost of raising kids for selected income group 
-age_yr = 20
-duration = 40
-age_mth = 5
-age_kid = 21
-incomeGrp = "High Income Group"
 
-calc_ageSelected <- function(age_yr,duration,age_mth,age_kid){
-age_Selected <- c(age_yr:(age_yr+duration))
-age_yrSelected <- c(rep(age_Selected[1],times=(12-age_mth)),rep(age_Selected[2:length(age_Selected)],rep(12,(length(age_Selected)-1))))
-age_yrSelected <- age_yrSelected[1:(duration*12)]
-month_Selected <- c(age_mth:11,rep(c(0:11),(length(age_Selected)-1)))
-month_Selected <- month_Selected[1:(duration*12)]
-
-}
-
-######FOR TESTING PURPOSE############
-# calc_costKid(age_yr = 20,
-#              duration = 40,
-#              age_mth = 5,
-#              age_kid = 21,
-#              incomeGrp = "High Income Group")
-####################################
 ##Variable explain (for own use)
 #age_yr - age(year) (can be found @ input$age)
 #duration - duration of projection(yrs) (can be found @ input$range)
@@ -148,8 +126,27 @@ calc_costKid <- function(age_yr,duration,age_mth,age_kid,incomeGrp){
     }
     costKid_table <- cbind.data.frame(Age = age_yrSelected,Month = month_Selected) %>%
                      mutate(kidCost = cost_kid)
-    }
+    return(costKid_table)
+}
 
-
-
-
+######FOR TESTING PURPOSE############
+# calc_costKid(age_yr = 20,
+#              duration = 40,
+#              age_mth = 5,
+#              age_kid = 21,
+#              incomeGrp = "High Income Group")
+####################################
+# 
+# kid_df <- calc_costKid(age_yr = 20,
+#                    duration = 40,
+#                    age_mth = 5,
+#                    age_kid = 21,
+#                    incomeGrp = "High Income Group")
+# kid_df2 <- calc_costKid(age_yr = 20,
+#                    duration = 40,
+#                    age_mth = 5,
+#                    age_kid = 21,
+#                    incomeGrp = "Low Income Group")
+# 
+# new_kid_cost_var <- paste0("kidCost", ncol(kid_df) - 2)
+# kid_df[, new_kid_cost_var] <- kid_df2$kidCost

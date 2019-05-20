@@ -1,4 +1,12 @@
-setwd("C:/Users/yinyen/Documents/finApp")
+# setwd("C:/Users/yinyen/Documents/finApp")
+setwd("C:/Users/jy/Desktop/FinanceApp")
+# install.packages(c("shiny", 'shinydashboard', 'plotly', 
+                   # 'shinyjs', 'shinyBS', 'ECharts2Shiny',
+                   # 'DT', 'readxl', 'quantmod'
+                   # 'dplyr', 'lubridate'
+                   # ))
+# install.packages("rvest")
+# install.packages("expss")
 library(shiny)
 library(shinydashboard)
 library(plotly)
@@ -118,7 +126,7 @@ ic_years_i <- fluidRow(
   column(width = 2,
          numericInput("range",
                       label=NULL,
-                      value = 3)
+                      value = 50)
   ))
 ic_years_s <- fluidRow(
   column(width = 3,
@@ -773,17 +781,18 @@ if (interactive()){
     #################################################Market index logic
 
     ##################################################new start
+    Result <- reactiveValues()
     v <- reactiveValues(data = NULL)
     observeEvent(input$action, {
       # print(interest)
       v$incomedata <- income_proj(input$init_income,input$growth_rate,input$growth_duration,input$range)
       print(v$sum)
       res$df <- final_df(as.numeric(input$age),as.numeric(input$range),as.numeric(input$age_m),as.numeric(input$growth_rate),as.numeric(input$growth_duration),as.numeric(input$promo_rate),as.numeric(input$promo_time),as.numeric(input$init_income))
-      #input$init_income,input$growth_rate,input$growth_duration,input$range
+      Result$Income_DF <- res$df %>% select(Date = as.character.date., Age = age_ot,
+                                            Month = month_ot, Income = proj_income)
     })
     output$mytable = DT::renderDataTable({
-      # final_df(as.numeric(input$age),as.numeric(input$range),as.numeric(input$age_m),as.numeric(input$growth_rate),as.numeric(input$growth_duration),as.numeric(input$promo_rate),as.numeric(input$promo_time),as.numeric(input$init_income))
-      res$df
+        res$df
     })
     
     output$plot_income <- renderPlotly({
@@ -828,26 +837,28 @@ if (interactive()){
         }
         # print(interest)
         sav$dfs <- saving_proj(input$numInput,interest,range_2)
-        
         v2$data <- saving_proj(input$numInput,input$AIR,input$range_2)
       
-        #input$init_income,input$growth_rate,input$growth_duration,input$range
+          output$mytable_2 = DT::renderDataTable({
+            # final_df(as.numeric(input$age),as.numeric(input$range),as.numeric(input$age_m),as.numeric(input$growth_rate),as.numeric(input$growth_duration),as.numeric(input$promo_rate),as.numeric(input$promo_time),as.numeric(input$init_income))
+            # if (is.null(v2)) return(data.frame())
+            # if (is.null(sav$dfs)) return(data.frame())
+            if (input$var == 'Monthly'){
+              title_1<-'Months'
+              colnames(sav$dfs)<-c(title_1,'Projection')
+              Result$FDSavings <- monthly_saving_df_convert(age = input$age, month = as.numeric(input$age_m), n = input$range, month_df = sav$dfs)
+              return(Result$FDSavings)
+            }
+            else{
+              title_1<-'Years'
+              colnames(sav$dfs)<-c(title_1,'Projection')
+              Result$FDSavings <- yearly_saving_df_convert(age = input$age, month = as.numeric(input$age_m), n = input$range, year_df = sav$dfs)
+              return(Result$FDSavings)
+            }
+          })
+      
       })
-
-      output$mytable_2 = DT::renderDataTable({
-        # final_df(as.numeric(input$age),as.numeric(input$range),as.numeric(input$age_m),as.numeric(input$growth_rate),as.numeric(input$growth_duration),as.numeric(input$promo_rate),as.numeric(input$promo_time),as.numeric(input$init_income))
-        if (is.null(v2)) return()
-        if (input$var == 'Monthly'){
-          title_1<-'Months'
-          colnames(sav$dfs)<-c(title_1,'Projection')
-          sav$dfs
-        }
-        else{
-          title_1<-'Years'
-          colnames(sav$dfs)<-c(title_1,'Projection')
-          sav$dfs
-        }
-      })
+      
       output$plot_saving <- renderPlotly({
         if (is.null(v2)) return()
         df_save<-sav$dfs
@@ -1034,15 +1045,20 @@ if (interactive()){
       calcMX_other <- reactiveValues(calcMX_list = list())
       
       observeEvent(input$addMX,{
-          
-          mXT_data$mXT_list[input$otherMX] <- input$otherMX_amount
-          
-          MX_other <- sapply(names(mXT_data$mXT_list), FUN = function(k){
-              paste0(k, " (RM) : ", mXT_data$mXT_list[[k]])
-          })
-          
-          MX_other <- paste(MX_other,collapse = " ; ")
-          
+          name <- input$otherMX
+          amount <- input$otherMX_amount
+          if(name == "" || is.na(amount)){
+              MX_other <- "Please make sure the inputs are valid."
+          }else{
+              mXT_data$mXT_list[name] <- amount
+              
+              MX_other <- sapply(names(mXT_data$mXT_list), FUN = function(k){
+                  paste0(k, ": RM ",  sprintf("%.2f", mXT_data$mXT_list[[k]]))
+                  # paste0(k, " (RM) : ", mXT_data$mXT_list[[k]])
+              })
+              
+              MX_other <- paste(MX_other, collapse = "; ")
+          }
           output$mxOut <- renderUI(MX_other)
       })
       
@@ -1076,21 +1092,25 @@ if (interactive()){
       NMX_other <- vector()
       
       observeEvent(input$addNMX,{
-          i <- length(nmXT_data$nmXT_list)
-          nmXT_data$nmXT_list[[i+1]] <- list(name = input$otherNMX, amount = input$otherNMX_amount,period = input$otherNMX_period)
-          
-          
-          for (j in 1:length(nmXT_data$nmXT_list)){
-              entry <- nmXT_data$nmXT_list[[j]]
-              name <- entry$name
-              amount <- entry$amount
-              period <- entry$period
-              NMX_other <- c(NMX_other, paste0(name," (RM): ", amount, " every ",period,"month(s)"))
+          name <- input$otherNMX
+          amount <- input$otherNMX_amount
+          period <- input$otherNMX_period
+          if(name == "" || is.na(amount) || is.na(period)){
+              NMX_other <- "Please make sure the inputs are valid."
+          }else{
+              i <- length(nmXT_data$nmXT_list)
+              nmXT_data$nmXT_list[[i+1]] <- list(name = name, amount = amount, period = period)
+              
+              for (j in 1:length(nmXT_data$nmXT_list)){
+                  entry <- nmXT_data$nmXT_list[[j]]
+                  name <- entry$name
+                  amount <- entry$amount
+                  period <- entry$period
+                  NMX_other <- c(NMX_other, paste0(name,": RM ", sprintf("%.2f", amount), " every ", period, " month(s)"))
+              }
+              NMX_other <- paste(NMX_other, collapse = "; ")
           }
-          
-          NMX_other <- paste(NMX_other, collapse = " ; ")
           output$nmxOut<-renderUI(NMX_other)
-          print(length(nmXT_data$nmXT_list))
       })
       
       #Sum of non-monthly expenses
@@ -1100,7 +1120,6 @@ if (interactive()){
           nmxt_fix <- c(input$nmxt1,input$nmxt2,input$nmxt3)
           
           fixed_nmexpense_total <- sum(nmx_fix/nmxt_fix)
-          print(length(nmXT_data$nmXT_list))
           
           other_nmexpense_total <- 0
           if(length(nmXT_data$nmXT_list)!=0){

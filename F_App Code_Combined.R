@@ -1085,7 +1085,7 @@ if (interactive()){
           
           total_mexp <- sum(fixed_mexpense_total,other_mexpense_total)
           
-          
+          Result$MExp_DF <- get_monthly_expense_df(age = input$age, month = as.numeric(input$age_m), n = input$range, total_monthly_expense = total_mexp)
       }
       )
       
@@ -1138,7 +1138,16 @@ if (interactive()){
               other_nmexpense_total <- 0
           }
           
+          NMExp_list <- nmXT_data$nmXT_list
+          N <- length(nmXT_data$nmXT_list)
+          for(j in 1:3){
+              temp_list <- list()
+              temp_list[["amount"]] <- nmx_fix[j]
+              temp_list[["period"]] <- nmxt_fix[j]
+              NMExp_list[[N+j]] <- temp_list
+          }
           total_nmexp <- sum(c(fixed_nmexpense_total,other_nmexpense_total))
+          Result$NMExp_DF <- get_non_monthly_expense_df(age = input$age, month = as.numeric(input$age_m), n = input$range, list_of_expenses = NMExp_list)
       }
       )
     

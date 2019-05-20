@@ -155,7 +155,42 @@ convert_to_age_month_df <- function(age, month, n, vect, column_name){
     
 }
 
+get_monthly_expense_df <- function(age, month, n, total_monthly_expense){
+    age_c<-c(age:(age+n))
+    age_ot<-c(rep(age_c[1],times=(12-month)),rep(age_c[2:length(age_c)],rep(12,(length(age_c)-1))))
+    age_ot<-age_ot[1:(n*12)]
+    month_ot<- c(month:11,rep(c(0:11),(length(age_c)-1)))
+    month_ot<-month_ot[1:(n*12)]
+    
+    df <- data.frame(Age = age_ot, Month = month_ot)
+    df[, "MonthlyExpense"] <- total_monthly_expense
+    return(df)
+}
 
+get_non_monthly_expense_df <- function(age, month, n, list_of_expenses){
+    age_c<-c(age:(age+n))
+    age_ot<-c(rep(age_c[1],times=(12-month)),rep(age_c[2:length(age_c)],rep(12,(length(age_c)-1))))
+    age_ot<-age_ot[1:(n*12)]
+    month_ot<- c(month:11,rep(c(0:11),(length(age_c)-1)))
+    month_ot<-month_ot[1:(n*12)]
+    N <- length(month_ot)
+    
+    df <- data.frame(Age = age_ot, Month = month_ot)
+    list_of_exp_vect <- lapply(list_of_expenses, FUN = function(entry){
+        name <- entry$name
+        amount <- entry$amount
+        period <- entry$period
+        exp <- rep(c(amount, rep(0, period - 1)), 2*as.integer(N/period))[1:N]
+        return(exp)
+    })
+    
+    exp_df <- do.call(cbind, list_of_exp_vect)
+    print(exp_df)
+    total_nonm_exp <- rowSums(exp_df)
+    print(total_nonm_exp)
+    df[, "NonMonthlyExpense"] <- total_nonm_exp
+    return(df)
+}
 
 
 # monthly_saving_df_convert(20, 2, 50, NULL)

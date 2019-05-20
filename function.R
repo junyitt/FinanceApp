@@ -141,6 +141,20 @@ yearly_saving_df_convert <- function(age, month, n, year_df){
 }
 
 
+convert_to_age_month_df <- function(age, month, n, vect, column_name){
+    age_c<-c(age:(age+n))
+    age_ot<-c(rep(age_c[1],times=(12-month)),rep(age_c[2:length(age_c)],rep(12,(length(age_c)-1))))
+    age_ot<-age_ot[1:(n*12)]
+    month_ot<- c(month:11,rep(c(0:11),(length(age_c)-1)))
+    month_ot<-month_ot[1:(n*12)]
+    
+    df <- data.frame(Age = age_ot, Month = month_ot)
+    df[, column_name] <- vect[1:length(month_ot)]
+    
+    return(df)
+    
+}
+
 
 
 

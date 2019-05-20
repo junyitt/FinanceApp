@@ -49,7 +49,7 @@ ind_sp500 <- fluidRow(
   column(width = 2,
          numericInput("sp500",
                       label=NULL,
-                      value = 0)
+                      value = 20)
   ))
 
 
@@ -60,7 +60,7 @@ ind_nasdaq <- fluidRow(
   column(width = 2,
          numericInput("nasdaq",
                       label=NULL,
-                      value = 0)
+                      value = 20)
   ))
 
 ind_nikkei <- fluidRow(
@@ -70,7 +70,7 @@ ind_nikkei <- fluidRow(
   column(width = 2,
          numericInput("nikkei",
                       label=NULL,
-                      value = 0)
+                      value = 20)
   ))    
 
 ind_bursa <- fluidRow(
@@ -80,7 +80,7 @@ ind_bursa <- fluidRow(
   column(width = 2,
          numericInput("bursa",
                       label=NULL,
-                      value = 0)
+                      value = 20)
   )) 
 
 ind_hangseng <- fluidRow(
@@ -90,7 +90,7 @@ ind_hangseng <- fluidRow(
   column(width = 2,
          numericInput("hangseng",
                       label=NULL,
-                      value = 0)
+                      value = 20)
   )) 
 
 ic_option <- fluidRow(
@@ -918,9 +918,8 @@ if (interactive()){
           if (v3$sum!=100){
             'Investment proportion does not add up to 100!'
           }else{
-            paste('Project!',as.character(ind_interest))
+            paste('Projected yearly returns:',sprintf("%.2f", 100*(ind_interest-1)), "%")
             # ind$dfs <- saving_proj(input$indInput,ind_interest,range)
-
           }
         })
         # print((ind_interest-1)*100)
@@ -933,7 +932,12 @@ if (interactive()){
         })
         output$ind_proj_graph <- renderPlotly({
           index_market<-saving_proj(input$indInput,(ind_interest-1)*100,input$range*12)
+          
           names(index_market)<-c('Months','Projection')
+          
+          Result$Investment_DF <- convert_to_age_month_df(age = input$age, month = as.numeric(input$age_m), n = input$range, 
+                                  vect = index_market$Projection, column_name = "Investment")
+          
           plot_ly(index_market, x = index_market$Months, y =index_market$Projection,type='scatter',mode='lines')%>%
             layout(
               title = 'Market Index Investment Projection',
@@ -946,7 +950,6 @@ if (interactive()){
               , height = 400, width = 800 
             )
         })
-        #input$init_income,input$growth_rate,input$growth_duration,input$range
       })
       # output$proj_res <- renderPlotly({
       #   index_market<-saving_proj(input$indInput,(ind_interest-1)*100,input$range*12)

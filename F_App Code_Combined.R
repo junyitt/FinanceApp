@@ -1180,34 +1180,18 @@ if (interactive()){
                                  data = dat())
                   })
     
-    # Show input of information of house loan
-    save_hData <- function(hData){
-      hData <- as.data.frame(t(hData))
-      if (exists("houseInput")){
-        houseInput <<- rbind(houseInput,hData)
-      }else{
-        houseInput <<- hData
-      }
-    }
-    
-    load_hData <- function(){
-      if (exists("houseInput")){
-        houseInput
-      }
-    }
-    
-    form_hData <- reactive({
-      hData <- sapply(houseDetails,function(x) input[[x]])
-      hData
-    })
-    
+    ##########################################
+    # Liability
+    ##########################################
+    LoanData <- reactiveValues(df = data.frame(), car_df = data.frame())
+    # Show input of information of HOUSE LOAN
     observeEvent(input$addLH,{
-      save_hData(form_hData())
-    })
-    
-    output$houseInput <- renderDataTable({
-      input$addLH
-      load_hData()
+        hData <- sapply(houseDetails,function(x) input[[x]])
+        LoanData$df <- rbind(LoanData$df, t(hData))
+        
+        output$houseInput <- renderDataTable({
+            as.data.frame(LoanData$df)
+        })
     })
     
     #House loan interest rate for different banks
@@ -1217,33 +1201,13 @@ if (interactive()){
                                                            pageLength = 5))
     
     # Show input of information of car loan
-    save_cData <- function(cData){
-      cData <- as.data.frame(t(cData))
-      if (exists("carInput")){
-        carInput <<- rbind(carInput,cData)
-      }else{
-        carInput <<- cData
-      }
-    }
-    
-    load_cData <- function(){
-      if (exists("carInput")){
-        carInput
-      }
-    }
-    
-    form_cData <- reactive({
-      cData <- sapply(carDetails,function(y) input[[y]])
-      cData
-    })
-    
-    observeEvent(input$addLC,{
-      save_cData(form_cData())
-    })
-    
-    output$carInput <- renderDataTable({
-      input$addLC
-      load_cData()
+     observeEvent(input$addLC,{
+        cData <- sapply(carDetails,function(x) input[[x]])
+        LoanData$car_df <- rbind(LoanData$car_df, t(cData))
+        
+        output$carInput <- renderDataTable({
+            as.data.frame(LoanData$car_df)
+        })
     })
     
     # Car loan interest rate for different banks
@@ -1252,34 +1216,20 @@ if (interactive()){
                                                          lengthMenu = c(10,30,50),
                                                          pageLength = 5))
     
+    
+    ########################################
+    # Dependency
+    ########################################
+    DepData <- reactiveValues(df = data.frame())
     # Show information of cost of raising kids
-    save_kData <- function(kData){
-      kData <- as.data.frame(t(kData))
-      if (exists("kidInput")){
-        kidInput <<- rbind(kidInput,kData)
-      }else{
-        kidInput <<- kData
-      }
-    }
-    
-    load_kData <- function(){
-      if (exists("kidInput")){
-        kidInput
-      }
-    }
-    
-    form_kData <- reactive({
-      kData <- sapply(kidDetails,function(z) input[[z]])
-      kData
-    })
     
     observeEvent(input$addDK,{
-      save_kData(form_kData())
-    })
-    
-    output$kidInput <- renderDataTable({
-      input$addDK
-      load_kData()
+        kData <- sapply(kidDetails,function(z) input[[z]])
+        DepData$df <- rbind(DepData$df, t(kData))
+        
+        output$kidInput <- renderDataTable({
+            as.data.frame(DepData$df)
+        })
     })
     
     # Options of cost of raising kids (low,middle,high)

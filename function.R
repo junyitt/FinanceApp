@@ -185,9 +185,7 @@ get_non_monthly_expense_df <- function(age, month, n, list_of_expenses){
     })
     
     exp_df <- do.call(cbind, list_of_exp_vect)
-    print(exp_df)
     total_nonm_exp <- rowSums(exp_df)
-    print(total_nonm_exp)
     df[, "NonMonthlyExpense"] <- total_nonm_exp
     return(df)
 }

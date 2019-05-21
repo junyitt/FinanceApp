@@ -1,5 +1,5 @@
-# setwd("C:/Users/yinyen/Documents/finApp")
-setwd("C:/Users/jy/Desktop/FinanceApp")
+setwd("C:/Users/yinyen/Documents/finApp")
+# setwd("C:/Users/jy/Desktop/FinanceApp")
 # install.packages(c("shiny", 'shinydashboard', 'plotly', 
                    # 'shinyjs', 'shinyBS', 'ECharts2Shiny',
                    # 'DT', 'readxl', 'quantmod'
@@ -784,11 +784,9 @@ if (interactive()){
     Result <- reactiveValues()
     v <- reactiveValues(data = NULL)
     observeEvent(input$action, {
-      # print(interest)
       v$incomedata <- income_proj(input$init_income,input$growth_rate,input$growth_duration,input$range)
-      print(v$sum)
       res$df <- final_df(as.numeric(input$age),as.numeric(input$range),as.numeric(input$age_m),as.numeric(input$growth_rate),as.numeric(input$growth_duration),as.numeric(input$promo_rate),as.numeric(input$promo_time),as.numeric(input$init_income))
-      Result$Income_DF <- res$df %>% select(Date = as.character.date., Age = age_ot,
+      Result$Income_DF <- res$df %>% select(Age = age_ot,
                                             Month = month_ot, Income = proj_income)
     })
     output$mytable = DT::renderDataTable({
@@ -914,6 +912,13 @@ if (interactive()){
         index_df<-index_data(input$range*12)
         ind_interest<-(1+sum(index_df$`Average Montly Return`*prop$prop_list)/100)
         
+        index_market<-saving_proj(input$indInput,(ind_interest-1)*100,input$range*12)
+        
+        names(index_market)<-c('Months','Projection')
+        
+        Result$Investment_DF <- convert_to_age_month_df(age = input$age, month = as.numeric(input$age_m), n = input$range, 
+                                                        vect = index_market$Projection, column_name = "Investment")
+        
         output$status <- renderText({ 
           if (v3$sum!=100){
             'Investment proportion does not add up to 100!'
@@ -934,9 +939,6 @@ if (interactive()){
           index_market<-saving_proj(input$indInput,(ind_interest-1)*100,input$range*12)
           
           names(index_market)<-c('Months','Projection')
-          
-          Result$Investment_DF <- convert_to_age_month_df(age = input$age, month = as.numeric(input$age_m), n = input$range, 
-                                  vect = index_market$Projection, column_name = "Investment")
           
           plot_ly(index_market, x = index_market$Months, y =index_market$Projection,type='scatter',mode='lines')%>%
             layout(
@@ -1196,7 +1198,7 @@ if (interactive()){
         output$houseInput <- renderDataTable({
             as.data.frame(LoanData$df)
         })
-        Result$House_DF <- get_overall_loan_amount(LoanData$df, input$range, input$age, input$age_m)
+        Result$House_DF <- get_overall_loan_amount(LoanData$df, input$range, input$age, input$age_m, "house")
     })
     
     #House loan interest rate for different banks
@@ -1214,7 +1216,7 @@ if (interactive()){
             as.data.frame(LoanData$car_df)
         })
         
-        Result$Car_DF <- get_overall_loan_amount(LoanData$car_df, input$range, input$age, input$age_m)
+        Result$Car_DF <- get_overall_loan_amount(LoanData$car_df, input$range, input$age, input$age_m, "car")
     })
     
     # Car loan interest rate for different banks
@@ -1237,6 +1239,10 @@ if (interactive()){
         output$kidInput <- renderDataTable({
             as.data.frame(DepData$df)
         })
+        
+        Result$Kid_DF <- get_overall_cost_kid(DepData$df, input$age, input$range, input$age_m)
+        rlist <- reactiveValuesToList(Result)
+        save(rlist, file = "templist.rda")
     })
     
     # Options of cost of raising kids (low,middle,high)
@@ -1264,15 +1270,6 @@ if (interactive()){
     output$costGraph <- renderPlotly(
       incomeGroup()$dfgraph
     )
-    
-    # Calculate cost of raising kids 
-    # observeEvent(input$addDK,{
-    #     
-    #    table <- calc_costKid(age_yr=as.numeric(input$age),duration=as.numeric(input$range),
-    #                              age_mth=as.numeric(input$age_m),age_kid=as.numeric(input$"Age (to have kid)") ,
-    #                              incomeGrp= as.character(input$"Cost of raising a kid (by income group)"))
-    # }
-    # )
     
   }}
 

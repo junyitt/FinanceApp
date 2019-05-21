@@ -22,6 +22,7 @@ source('function.R')
 source("loanRate.r")
 source("raiseKidCost.r")
 source('Index_Data.R')
+source('generate_result_plots.R')
 ######Choobs variable############################################
 index_proj_res <- fluidRow(
   column(width = 8,
@@ -653,13 +654,22 @@ raiseKidC_table <- fluidRow(
   )
 )
 
+### Result
+resultbutton <- fluidRow(
+    column(width = 3,
+           actionButton("runresult","Run Result")
+    )
+)
+
+
 #Sidebar
 sidebar <- dashboardSidebar(
   sidebarMenu(
     menuItem("Income",tabName = "income",icon = icon("wallet")),
     menuItem("Expense",tabName = "expense",icon = icon("receipt") ),
     menuItem("Liability",tabName = "liability",icon = icon("file-invoice-dollar")),
-    menuItem("Dependency",tabName = "dependency",icon = icon("child"))
+    menuItem("Dependency",tabName = "dependency",icon = icon("child")),
+    menuItem("Result",tabName = "result",icon = icon("poll"))
   )
 )
 
@@ -763,6 +773,27 @@ body <- dashboardBody(
                    # raiseKidC_table,
                    # hr(color="grey"),
                    # h5(em("Source: https://www.theedgemarkets.com/article/cover-story-cost-raising-child-today/"))
+            )),
+    
+    # Results
+    tabItem(tabName = "result",
+            tabBox(title = strong("Result"),
+                   id = "tabE",height = "110em",width = "1em",
+                   tabPanel(
+                            "",
+                            resultbutton,
+                            # raiseKidAge,raiseKidOpt,raiseKidAdd,
+                            hr(style = "border-color:white;"),
+                            hr(style = "border-color:white;"),
+                            hr(),
+                            plotlyOutput("breakdownGraph"),
+                            hr(),
+                            plotlyOutput("ieGraph"),
+                            hr(),
+                            plotlyOutput("networthGraph")
+                            ),
+                   hr(style = "border-color:white;"),
+                   hr(style = "border-color:white;")
             ))
   )
 )
@@ -1241,8 +1272,6 @@ if (interactive()){
         })
         
         Result$Kid_DF <- get_overall_cost_kid(DepData$df, input$age, input$range, input$age_m)
-        rlist <- reactiveValuesToList(Result)
-        save(rlist, file = "templist.rda")
     })
     
     # Options of cost of raising kids (low,middle,high)
@@ -1270,6 +1299,26 @@ if (interactive()){
     output$costGraph <- renderPlotly(
       incomeGroup()$dfgraph
     )
+    
+    
+    #################################
+    # Result
+    #################################
+    plot_data <- reactiveValues(plist = list())
+    observeEvent(input$runresult,{
+        rlist <- reactiveValuesToList(Result)
+        plot_data$plist <- generate_final_plots(rlist = rlist)
+        
+        output$breakdownGraph <- renderPlotly(
+            plot_data$plist[[1]]
+        )
+        output$ieGraph <- renderPlotly(
+            plot_data$plist[[2]]
+        )
+        output$networthGraph <- renderPlotly(
+            plot_data$plist[[3]]
+        )
+    })
     
   }}
 

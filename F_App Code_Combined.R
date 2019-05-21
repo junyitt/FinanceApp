@@ -968,6 +968,10 @@ if (interactive()){
       output$index_tab = DT::renderDataTable({
         # final_df(as.numeric(input$age),as.numeric(input$range),as.numeric(input$age_m),as.numeric(input$growth_rate),as.numeric(input$growth_duration),as.numeric(input$promo_rate),as.numeric(input$promo_time),as.numeric(input$init_income))
         index_df<-index_data(input$range*12)
+        month_ret <- index_df[,2]
+        
+        index_df[,2] <- paste(round(as.numeric(month_ret),2), "%")
+        index_df
       })
       output$sp500_ind <- renderPlotly({
         GSPC_<-sp500_graph(input$range*12)
@@ -1192,6 +1196,7 @@ if (interactive()){
         output$houseInput <- renderDataTable({
             as.data.frame(LoanData$df)
         })
+        Result$House_DF <- get_overall_loan_amount(LoanData$df, input$range, input$age, input$age_m)
     })
     
     #House loan interest rate for different banks
@@ -1208,6 +1213,8 @@ if (interactive()){
         output$carInput <- renderDataTable({
             as.data.frame(LoanData$car_df)
         })
+        
+        Result$Car_DF <- get_overall_loan_amount(LoanData$car_df, input$range, input$age, input$age_m)
     })
     
     # Car loan interest rate for different banks

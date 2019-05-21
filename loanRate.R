@@ -86,6 +86,27 @@ calc_carloanAmount <- function(principal,downPayment,loanDuration,interestRate,a
     
 }
 
+get_overall_loan_amount <- function(loan_df, duration, age, age_mth){
+    df_list <- apply(loan_df, 1, FUN = function(j){
+        calc_carloanAmount(principal=j[1],
+                           downPayment=j[2],
+                           loanDuration=j[3],
+                           interestRate=j[4],
+                           age_yr= age,
+                           duration=duration, 
+                           age_mth=as.numeric(age_mth),
+                           age_loan=j[5])
+        
+    })
+    amount_df <- sapply(df_list, FUN = function(j){
+        j$CarLoanAmount
+    })
+    df2 <- df_list[[1]][,c("Age", "Month")]
+    df2$CarLoanAmount <- rowSums(amount_df)
+    return(df2)    
+}
+
+
 ######FOR TESTING PURPOSE############
 # cdf <- calc_loanAmount(principal=60000,
 #                 downPayment=6000,
@@ -96,6 +117,8 @@ calc_carloanAmount <- function(principal,downPayment,loanDuration,interestRate,a
 #                 age_mth=7,
 #                 age_loan=22)
 ####################################
+
+
 
 # cdf2 <- calc_carloanAmount(principal=60000,
 #                            downPayment=6000,

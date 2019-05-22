@@ -11,6 +11,7 @@ generate_empty_age_df <- function(age_yr,duration,age_mth, add_column){
     df <- data.frame(Age = age_yrSelected, Month = month_Selected)
     df[, add_column] <- 0
     return(df)
+    
 }
 
 future_val<-function(p,r,n){
@@ -46,26 +47,7 @@ saving_proj<-function(p,r,n){
   }
   return(data)
 }
-#plot(data,type='l')
-#saving_proj(1000,5,30)
 
-#income_proj(3000,5,2,5)
-# income_proj<-function(income,r,year,n,pr,p){
-#   if(missing(p) & missing(pr)){
-#     data<-rep(0,(n%/%year)+1)
-#     init=income
-#     data[1]<-income
-#     for (i in 1:(n%/%year)){
-#       init=init*(1+(r/100))
-#       data[i+1]<-init
-#     }
-#     return(data)
-#   }
-#   else{
-#     
-#   }
-# }
-# income_proj(3000,5,2,10)
 income_proj<-function(income,r,year,n,pr,p){
   if(missing(p) & missing(pr)){
     data<-rep(0,(n%/%year)+1)
@@ -81,25 +63,23 @@ income_proj<-function(income,r,year,n,pr,p){
     
   }
 }
-income_proj(3000,5,2,10)
+
+# # Example
+# income_proj(3000,5,2,10)
+
+
 final_df<-function(age,n,month,ir,growth_d,pr,pt,init_inc){
   age_c<-c(age:(age+n))
   age_ot<-c(rep(age_c[1],times=(12-month)),rep(age_c[2:length(age_c)],rep(12,(length(age_c)-1))))
   age_ot<-age_ot[1:(n*12)]
   month_ot<- c(month:11,rep(c(0:11),(length(age_c)-1)))
   month_ot<-month_ot[1:(n*12)]
-  #print(age_ot)
-  #print(month_ot)
-  ####
   temp<-n%/%growth_d
   r<-ir
   temp_1<-c(0:temp)
-  #print(temp_1)
   temp_2<-sapply(temp_1,function(x){ return ((1+ir/100)**x)})
   temp_3<-rep(temp_2,each=(growth_d*12))
   growth_r<-temp_3[1:(n*12)]
-  #print(length(growth_r))
-  ##
   temp_p<-n%/%pt
   r<-pr
   temp_p_1<-c(0:temp_p)
@@ -111,16 +91,15 @@ final_df<-function(age,n,month,ir,growth_d,pr,pt,init_inc){
   
   combine_r<-growth_r*promo_r
   proj_income<-init_income*combine_r
-  #print(age_ot)
- # print(month_ot)
   date<-paste(age_ot,month_ot,sep='-')
-  #print(combine_r)
-#  print(date)
   ##
   age_df<-data.frame(as.character(date),age_ot,month_ot,growth_r,promo_r,combine_r,proj_income)
   return(age_df)
 }
-x<-final_df(20,11,0,5,2,10,5,3000)
+
+# # Example
+# x<-final_df(20,11,0,5,2,10,5,3000)
+
 access_df<-function(df,x){
   return(df[x])
 }
@@ -154,7 +133,6 @@ yearly_saving_df_convert <- function(age, month, n, year_df){
     return(df)
     
 }
-
 
 convert_to_age_month_df <- function(age, month, n, vect, column_name){
     age_c<-c(age:(age+n))

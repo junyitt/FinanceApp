@@ -1,3 +1,18 @@
+library(dplyr)
+
+generate_empty_age_df <- function(age_yr,duration,age_mth, add_column){
+    age_Selected <- c(age_yr:(age_yr+duration))
+    age_yrSelected <- c(rep(age_Selected[1],times=(12-age_mth)),
+                        rep(age_Selected[2:length(age_Selected)],rep(12,(length(age_Selected)-1)))
+    )
+    age_yrSelected <- age_yrSelected[1:(duration*12)]
+    month_Selected <- c(age_mth:11,rep(c(0:11),(length(age_Selected)-1)))
+    month_Selected <- month_Selected[1:(duration*12)]
+    df <- data.frame(Age = age_yrSelected, Month = month_Selected)
+    df[, add_column] <- 0
+    return(df)
+}
+
 future_val<-function(p,r,n){
   returnValue(p*(((1+r/100)**n)-1)/(r/100))
 

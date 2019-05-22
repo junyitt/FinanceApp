@@ -5,7 +5,7 @@ library(plotly)
 library(expss)
 
 #Table of cost of raising a kid in Malaysia
-raiseKidCost <- as.data.frame(read_excel("raiseKidCost.xlsx"))
+raiseKidCost <- as.data.frame(read_excel("raisekidcost.xlsx"))
 
 #Cost of raising a kid for different income groups
 costPerYear <- gsub(",","",

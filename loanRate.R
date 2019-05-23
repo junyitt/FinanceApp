@@ -55,8 +55,9 @@ calc_houseloanAmount <- function(principal,downPayment,loanDuration,interestRate
     loan_amt[age_loanIndex] <- c(downPayment+loanPerMonth)
     loan_amt[(age_loanIndex+1):(age_loanIndex+((loanDuration*12)-1))] <- c(rep(loanPerMonth,times = ((loanDuration*12)-1)))
     
+    LEN <- length(age_yrSelected)
     loanAmt_table <- cbind.data.frame(Age = age_yrSelected,Month = month_Selected) %>%
-        mutate(HouseLoanAmount = loan_amt)
+        mutate(HouseLoanAmount = loan_amt[1:LEN])
     return(loanAmt_table)
 }
 
@@ -79,30 +80,54 @@ calc_carloanAmount <- function(principal,downPayment,loanDuration,interestRate,a
     loan_amt <- c(rep(0,times = (length(age_yrSelected))))
     loan_amt[age_loanIndex] <- c(downPayment+loanPerMonth)
     loan_amt[(age_loanIndex+1):(age_loanIndex+((loanDuration*12)-1))] <- c(rep(loanPerMonth,times = ((loanDuration*12)-1)))
+    LEN <- length(age_yrSelected)
     
     loanAmt_table <- cbind.data.frame(Age = age_yrSelected,Month = month_Selected) %>%
-        mutate(CarLoanAmount = loan_amt)
+        mutate(CarLoanAmount = loan_amt[1:LEN])
     return(loanAmt_table)
     
 }
 
-get_overall_loan_amount <- function(loan_df, duration, age, age_mth){
+get_overall_loan_amount <- function(loan_df, duration, age, age_mth, type = "car"){
+    if(type == "car"){
+        col = "CarLoanAmount"
+    }else{
+        col = "HouseLoanAmount"
+    }
     df_list <- apply(loan_df, 1, FUN = function(j){
-        calc_carloanAmount(principal=j[1],
-                           downPayment=j[2],
-                           loanDuration=j[3],
-                           interestRate=j[4],
-                           age_yr= age,
-                           duration=duration, 
-                           age_mth=as.numeric(age_mth),
-                           age_loan=j[5])
+        if(type == "car"){
+            dff <- calc_carloanAmount(principal=j[1],
+                               downPayment=j[2],
+                               loanDuration=j[3],
+                               interestRate=j[4],
+                               age_yr= age,
+                               duration=duration, 
+                               age_mth=as.numeric(age_mth),
+                               age_loan=j[5])
+            
+        }else{
+            dff <- calc_houseloanAmount(principal=j[1],
+                                 downPayment=j[2],
+                                 loanDuration=j[3],
+                                 interestRate=j[4],
+                                 age_yr= age,
+                                 duration=duration, 
+                                 age_mth=as.numeric(age_mth),
+                                 age_loan=j[5])
+        }
+        
         
     })
+    
+    if(length(df_list) == 1){
+        return(df_list[[1]])
+    }
+    
     amount_df <- sapply(df_list, FUN = function(j){
-        j$CarLoanAmount
+        j[,col]
     })
     df2 <- df_list[[1]][,c("Age", "Month")]
-    df2$CarLoanAmount <- rowSums(amount_df)
+    df2[,col] <- rowSums(amount_df)
     return(df2)    
 }
 

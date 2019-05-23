@@ -5,7 +5,7 @@ library(plotly)
 library(expss)
 
 #Table of cost of raising a kid in Malaysia
-raiseKidCost <- as.data.frame(read_excel("raiseKidCost.xlsx"))
+raiseKidCost <- as.data.frame(read_excel("raisekidcost.xlsx"))
 
 #Cost of raising a kid for different income groups
 costPerYear <- gsub(",","",
@@ -124,9 +124,32 @@ calc_costKid <- function(age_yr,duration,age_mth,age_kid,incomeGrp){
                                                                          (rep((160000/12),times =(4*12)))
                                                                          )
     }
-    costKid_table <- cbind.data.frame(Age = age_yrSelected,Month = month_Selected) %>%
-                     mutate(kidCost = cost_kid)
+    
+    LEN <- length(age_yrSelected)
+    costKid_table <- cbind.data.frame(Age = age_yrSelected, Month = month_Selected) %>%
+                     mutate(kidCost = cost_kid[1:LEN])
     return(costKid_table)
+}
+
+get_overall_cost_kid <- function(kid_df, age_yr, duration, age_mth){
+    df_list <- apply(kid_df, 1, FUN = function(j){
+        calc_costKid(
+                    age_yr=as.numeric(age_yr),
+                    duration=as.numeric(duration),
+                    age_mth=as.numeric(age_mth),
+                    age_kid=as.numeric(j[1]),
+                    incomeGrp= as.character(j[2])
+                    )
+    })
+    if(length(df_list) == 1){
+        return(df_list[[1]])
+    }
+    amount_df <- sapply(df_list, FUN = function(j){
+        j$kidCost
+    })
+    df2 <- df_list[[1]][,c("Age", "Month")]
+    df2$kidCost <- rowSums(amount_df)
+    return(df2)
 }
 
 ######FOR TESTING PURPOSE############

@@ -1,0 +1,10 @@
+name: Publish Document
+title:
+username:
+account: rpubs
+server: rpubs.com
+hostUrl: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/499119/ca3eada507614824bddf4d0d72b7bec2
+bundleId: https://api.rpubs.com/api/v1/document/499119/ca3eada507614824bddf4d0d72b7bec2
+url: http://rpubs.com/yinyen/499119
+when: 1558761548.56483

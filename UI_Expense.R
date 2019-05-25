@@ -105,7 +105,7 @@ mx_other <- fluidRow(
            numericInput(inputId = "otherMX_amount",
                         label = h5("Amount (RM):"),
                         value = NULL
-           )),
+           )),hr(style = "border-color:white;"),
     column(width = 1,
            actionButton("addMX","Add Expense")
     )
@@ -210,7 +210,7 @@ nmx_other <- fluidRow(
            numericInput(inputId = "otherNMX_period",
                         label = h5("Period (months)"),
                         value = NULL
-           )),
+           )),hr(style = "border-color:white;"),
     column(width = 1,
            actionButton("addNMX","Add Expense")
     )

@@ -54,7 +54,8 @@ body <- dashboardBody(
                        tabPanel(strong("Promotion & Increment"),ic_age,ic_month,ic_income,ic_g_rate,
                                 ic_g_dur,ic_p_rate,ic_p_dur, ic_years_i,hr(),
                                 income_but, hr()),
-                       tabPanel(strong("Income Projection Graph"),hr(),
+                       tabPanel(hr(style = "border-color:white;"),
+                                strong("Income Projection Graph"),
                                 plotlyOutput("plot_income"))
                 )
         ),
@@ -66,7 +67,8 @@ body <- dashboardBody(
                        tabPanel(strong("Savings"),ic_option,ic_amount,ic_fdrate,ic_years_s, hr(),
                                 saving_but,hr(),
                                 ic_save_tab),
-                       tabPanel(strong("Saving Projection Graph"),hr(),
+                       tabPanel(hr(style = "border-color:white;"),
+                                strong("Saving Projection Graph"),
                                 plotlyOutput("plot_saving"))
                 )
         ),
@@ -75,14 +77,14 @@ body <- dashboardBody(
         tabItem(tabName = "investment",
                 tabBox(title = strong("Investment"),
                        id = "tabInv", height = "170em", width = "1em",
-                       tabPanel(strong("Stock Index Investment"),hr(),
+                       tabPanel(strong("Stock Index Investment"),
                                 h5(strong("Percentage to invest for each Market Index (Please refer to Historical Graph & The Monthly Average Return")),ind_amount,
                                 ind_hangseng,ind_nasdaq,ind_nikkei,ind_bursa,ind_sp500,hr(),index_but,ind_status,
                                 hr(strong("Average Montly Return for each index in %"),ic_index_tab,hr())),
-                       tabPanel(strong("Market Index Historical Plot"),hr(),
+                       tabPanel(strong("Market Index Historical Plot"),
                                 h5(strong("Monthly Performance Graph for each Market Index")),
                                 plotlyOutput("bursa_ind"),hr(),plotlyOutput("nikkei_ind"),hr(),plotlyOutput("nasdaq_ind"),hr(),plotlyOutput("sp500_ind"),hr(),plotlyOutput("hangseng_ind")),
-                       tabPanel(strong("Market Index Investment Projection Graph"),hr(),
+                       tabPanel(strong("Market Index Investment Projection Graph"),
                                 plotlyOutput("ind_proj_graph"),index_proj_res)  
                 )
         ),
@@ -156,18 +158,20 @@ body <- dashboardBody(
         # Results
         tabItem(tabName = "result",
                 tabBox(title = strong("Result"),
-                       id = "tabE",height = "110em",width = "1em",
+                       id = "tabE",height = "130em",width = "1em",
                        tabPanel(
-                           "",
+                           "",inflationRate,expenseGrowth,hr(),
                            resultbutton,
-                           # raiseKidAge,raiseKidOpt,raiseKidAdd,
-                           hr(style = "border-color:white;"),
-                           hr(style = "border-color:white;"),
                            hr(),
+                           hr(style = "border-color:white;"),
                            plotlyOutput("breakdownGraph"),
+                           hr(style = "border-color:white;"),
                            hr(),
+                           hr(style = "border-color:white;"),
                            plotlyOutput("ieGraph"),
+                           hr(style = "border-color:white;"),
                            hr(),
+                           hr(style = "border-color:white;"),
                            plotlyOutput("networthGraph")
                        ),
                        hr(style = "border-color:white;"),

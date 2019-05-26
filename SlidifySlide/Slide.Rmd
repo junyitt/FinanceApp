@@ -60,5 +60,6 @@ FiNap <span class='red3'>projects</span> users' <span class='red3'>future income
   
 <!-- ![](netWorth.png =100x20) -->
 <img src="netWorth.png" alt="drawing" width="800"/>
-  
+
+The source code can be found [here](https://github.com/junyitt/FinanceApp).  
 Finally, let's look at the demonstration of the app [here](https://jycheah.shinyapps.io/FiNap). 

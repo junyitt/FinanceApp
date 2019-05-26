@@ -18,7 +18,7 @@ library(quantmod)
 source('function.R')
 source("loanRate.R")
 source("raiseKidCost.R")
-source('index_data.R')
+source('Index_Data.R')
 source('generate_result_plots.R')
 
 server <- function(input, output,session){

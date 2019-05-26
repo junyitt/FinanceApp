@@ -165,7 +165,7 @@ income_exp_breakdown_plot <- function(data, selected_age){
 
 ## Examples
 # setwd("C:/Users/yinyen/Documents/finApp")
-load("rlist.rda")
-data <- generate_final_data(rlist)
-income_exp_breakdown_plot(data, 27)
+# load("rlist.rda")
+# data <- generate_final_data(rlist)
+# income_exp_breakdown_plot(data, 27)
 # plotly_list <- generate_final_plots(rlist)

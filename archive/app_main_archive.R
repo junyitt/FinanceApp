@@ -25,9 +25,9 @@ library(expss)
 library(quantmod)
 
 source('function.R')
-source("loanrate.R")
-source("raisekidcost.R")
-source('index_data.R')
+source("loanRate.R")
+source("raiseKidCost.R")
+source('Index_Data.R')
 source('generate_result_plots.R')
 
 #Source UI variables (Input/Buttons/Div etc.)

@@ -6,7 +6,7 @@ library(shinyBS)
 library(ECharts2Shiny)
 library(DT)
 library(readxl)
-source("loanrate.R")
+source("loanRate.R")
 
 # setwd("C:/Users/yinyen/Documents/finApp")
 
@@ -268,7 +268,7 @@ carIR_table <- fluidRow(
                                dataTableOutput("carLoanRate"))
                 )
 
-raiseKidCost <- as.data.frame(read_excel("raisekidcost.xlsx"))
+raiseKidCost <- as.data.frame(read_excel("raiseKidCost.xlsx"))
 
 raiseKidC_table <- fluidRow(
                             column(width = 12,

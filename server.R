@@ -16,8 +16,8 @@ library(expss)
 library(quantmod)
 
 source('function.R')
-source("loanrate.R")
-source("raisekidcost.R")
+source("loanRate.R")
+source("raiseKidCost.R")
 source('index_data.R')
 source('generate_result_plots.R')
 
@@ -26,8 +26,6 @@ server <- function(input, output,session){
     
     ##################################################new start
     Result <- reactiveValues()
-    
-    
     
     v <- reactiveValues(data = NULL)
     observeEvent(input$action, {
@@ -328,6 +326,7 @@ server <- function(input, output,session){
         total_mexp <- sum(fixed_mexpense_total,other_mexpense_total)
         
         Result$MExp_DF <- get_monthly_expense_df(age = input$age, month = as.numeric(input$age_m), n = input$range, total_monthly_expense = total_mexp)
+        output$mx_status <- renderText("Successfully added Monthly Expenses.")
     }
     )
     
@@ -390,6 +389,7 @@ server <- function(input, output,session){
         }
         total_nmexp <- sum(c(fixed_nmexpense_total,other_nmexpense_total))
         Result$NMExp_DF <- get_non_monthly_expense_df(age = input$age, month = as.numeric(input$age_m), n = input$range, list_of_expenses = NMExp_list)
+        output$nmx_status <- renderText("Successfully added Non-Monthly Expenses.")
     }
     )
     
@@ -434,7 +434,11 @@ server <- function(input, output,session){
         output$houseInput <- renderDataTable({
             as.data.frame(LoanData$df)
         })
-        Result$House_DF <- get_overall_loan_amount(LoanData$df, input$range, input$age, input$age_m, "house")
+        out <- get_overall_loan_amount(LoanData$df, input$range, input$age, input$age_m, "house")
+        if(!is.null(out)){
+            Result$House_DF  <- out    
+        }
+        
     })
     
     #House loan interest rate for different banks
@@ -452,7 +456,10 @@ server <- function(input, output,session){
             as.data.frame(LoanData$car_df)
         })
         
-        Result$Car_DF <- get_overall_loan_amount(LoanData$car_df, input$range, input$age, input$age_m, "car")
+        out <- get_overall_loan_amount(LoanData$car_df, input$range, input$age, input$age_m, "car")
+        if(!is.null(out)){
+            Result$Car_DF  <- out    
+        }
     })
     
     # Car loan interest rate for different banks
@@ -511,18 +518,37 @@ server <- function(input, output,session){
     #################################
     plot_data <- reactiveValues(plist = list())
     observeEvent(input$runresult,{
-        rlist <- reactiveValuesToList(Result)
-        plot_data$plist <- generate_final_plots(rlist = rlist)
+        tryCatch({
+            rlist <- reactiveValuesToList(Result)
+            # save(rlist, file = "rlist.rda")
+            
+            data <- generate_final_data(rlist, inflation_rate = input$inflationR/100, exp_growth_rate = input$expenseG/100)
+                
+            plot_data$plist <- generate_final_plots(data)
+            
+            
+            output$ieGraph <- renderPlotly(
+                plot_data$plist[[2]]
+            )
+            output$networthGraph <- renderPlotly(
+                plot_data$plist[[3]]
+            )
+            output$run_result_status <- renderText("")
+            output$first_debt <- renderText(plot_data$plist[[4]])
+            output$last_debt <- renderText(plot_data$plist[[5]])
+            output$networth <- renderText(plot_data$plist[[6]])
+            output$mspend <- renderText(plot_data$plist[[7]])
+            
+            output$breakdownGraph <- renderPlotly(
+                income_exp_breakdown_plot(data, input$result_selected_age)
+            )
+            
+        }, error = function(E){
+            output$run_result_status <- renderText(
+                "Error: Please make sure you have initialized your income information and click the Income Projection button."
+            )
+        })
         
-        output$breakdownGraph <- renderPlotly(
-            plot_data$plist[[1]]
-        )
-        output$ieGraph <- renderPlotly(
-            plot_data$plist[[2]]
-        )
-        output$networthGraph <- renderPlotly(
-            plot_data$plist[[3]]
-        )
     })
     
 }

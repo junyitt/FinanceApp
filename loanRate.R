@@ -14,8 +14,8 @@ rateHL <- numextract(webpageHL$Interest.Rate)
 
 houseLoanRate <- data.frame(webpageHL$Bank.logo,rateHL)
 names(houseLoanRate) <- c("Bank Loan Product","Interest Rate")
-houseLoanRate <- arrange(houseLoanRate,.by_group = "Bank Loan Product")
-
+# houseLoanRate <- arrange(houseLoanRate,.by_group = "Bank Loan Product")
+houseLoanRate <- houseLoanRate %>% arrange(`Bank Loan Product`)
 
 #Interest rate of car loan
 urlCL <- "https://ringgitplus.com/en/car-loan/"
@@ -25,7 +25,8 @@ rateCL <- numextract(webpageCL$Interest.Rate)
 
 carLoanRate <- data.frame(webpageCL$Bank.logo,rateCL)
 names(carLoanRate) <- c("Bank Loan Product","Interest Rate")
-carLoanRate <- arrange(carLoanRate,.by_group = "Bank Loan Product")
+# carLoanRate <- arrange(carLoanRate,.by_group = "Bank Loan Product")
+carLoanRate <- carLoanRate %>% arrange(`Bank Loan Product`)
 
 
 ##Variable explain (for own use)
@@ -95,40 +96,50 @@ get_overall_loan_amount <- function(loan_df, duration, age, age_mth, type = "car
         col = "HouseLoanAmount"
     }
     df_list <- apply(loan_df, 1, FUN = function(j){
-        if(type == "car"){
-            dff <- calc_carloanAmount(principal=j[1],
-                               downPayment=j[2],
-                               loanDuration=j[3],
-                               interestRate=j[4],
-                               age_yr= age,
-                               duration=duration, 
-                               age_mth=as.numeric(age_mth),
-                               age_loan=j[5])
-            
-        }else{
-            dff <- calc_houseloanAmount(principal=j[1],
-                                 downPayment=j[2],
-                                 loanDuration=j[3],
-                                 interestRate=j[4],
-                                 age_yr= age,
-                                 duration=duration, 
-                                 age_mth=as.numeric(age_mth),
-                                 age_loan=j[5])
-        }
-        
-        
+        tryCatch({
+            if(type == "car"){
+                dff <- calc_carloanAmount(principal=j[1],
+                                          downPayment=j[2],
+                                          loanDuration=j[3],
+                                          interestRate=j[4],
+                                          age_yr= age,
+                                          duration=duration, 
+                                          age_mth=as.numeric(age_mth),
+                                          age_loan=j[5])
+                
+            }else{
+                dff <- calc_houseloanAmount(principal=j[1],
+                                            downPayment=j[2],
+                                            loanDuration=j[3],
+                                            interestRate=j[4],
+                                            age_yr= age,
+                                            duration=duration, 
+                                            age_mth=as.numeric(age_mth),
+                                            age_loan=j[5])
+            }
+            dff
+        }, error = function(e){
+            NULL
+        })
     })
     
-    if(length(df_list) == 1){
+    if(length(df_list) == 0){
+        return(NULL)
+    }else if(length(df_list) == 1){
         return(df_list[[1]])
+    }else{
+        amount_df <- sapply(df_list, FUN = function(j){
+            j[,col]
+        })
+        df2 <- df_list[[1]][,c("Age", "Month")]
+        
+        df2[,col] <- tryCatch({
+            rowSums(amount_df)
+        }, error = function(e2){
+            0
+        })
+        return(df2) 
     }
-    
-    amount_df <- sapply(df_list, FUN = function(j){
-        j[,col]
-    })
-    df2 <- df_list[[1]][,c("Age", "Month")]
-    df2[,col] <- rowSums(amount_df)
-    return(df2)    
 }
 
 

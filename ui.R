@@ -54,8 +54,8 @@ body <- dashboardBody(
                        tabPanel(strong("Promotion & Increment"),ic_age,ic_month,ic_income,ic_g_rate,
                                 ic_g_dur,ic_p_rate,ic_p_dur, ic_years_i,hr(),
                                 income_but, hr()),
-                       tabPanel(hr(style = "border-color:white;"),
-                                strong("Income Projection Graph"),
+                       tabPanel(strong("Income Projection Graph"),
+                                hr(style = "border-color:white;"),
                                 plotlyOutput("plot_income"))
                 )
         ),
@@ -67,8 +67,9 @@ body <- dashboardBody(
                        tabPanel(strong("Savings"),ic_option,ic_amount,ic_fdrate,ic_years_s, hr(),
                                 saving_but,hr(),
                                 ic_save_tab),
-                       tabPanel(hr(style = "border-color:white;"),
+                       tabPanel(
                                 strong("Saving Projection Graph"),
+                                hr(style = "border-color:white;"),
                                 plotlyOutput("plot_saving"))
                 )
         ),
@@ -84,7 +85,7 @@ body <- dashboardBody(
                        tabPanel(strong("Market Index Historical Plot"),
                                 h5(strong("Monthly Performance Graph for each Market Index")),
                                 plotlyOutput("bursa_ind"),hr(),plotlyOutput("nikkei_ind"),hr(),plotlyOutput("nasdaq_ind"),hr(),plotlyOutput("sp500_ind"),hr(),plotlyOutput("hangseng_ind")),
-                       tabPanel(strong("Market Index Investment Projection Graph"),
+                       tabPanel(strong("Investment Projection"),
                                 plotlyOutput("ind_proj_graph"),index_proj_res)  
                 )
         ),
@@ -93,8 +94,8 @@ body <- dashboardBody(
         tabItem(tabName = "expense",
                 tabBox(title = strong("Expense"),
                        id = "tabX", height = "20em", width = "1em",
-                       tabPanel(strong("Monthly"),mx_food,mx_transport,mx_rent,mx_water,mx_electric,mx_wifi,mx_tel,mx_astro,mx_other,mx_output,hr(),mx_done,hr()),
-                       tabPanel(strong("Non-monthly"),nmx_travel,nmx_carIns,nmx_healthIns,nmx_other,nmx_output,hr(),nmx_done,hr()),
+                       tabPanel(strong("Monthly"),mx_food,mx_transport,mx_rent,mx_water,mx_electric,mx_wifi,mx_tel,mx_astro,mx_other,mx_output,hr(),mx_done,hr(), textOutput(outputId = "mx_status")),
+                       tabPanel(strong("Non-monthly"),nmx_travel,nmx_carIns,nmx_healthIns,nmx_other,nmx_output,hr(),nmx_done,hr(),textOutput(outputId = "nmx_status")),
                        tabPanel(strong("Pie Chart"),h4(strong("Monthly Expenses"),align = "center"),loadEChartsLibrary(),tags$div(id="mxChart",style = "width:100%;height:400px"), deliverChart(div_id="mxChart"))
                 )
         ),
@@ -139,15 +140,16 @@ body <- dashboardBody(
                        tabPanel("",
                                 raiseKidAge,raiseKidOpt,raiseKidAdd,
                                 hr(style = "border-color:white;"),
+                                hr(strong("Information of Cost of Raising The Kids:")),
+                                raiseKidTab,
+                                hr(style = "border-color:white;"),
                                 dataTableOutput("costTable"),
                                 h5(em("Source: https://www.theedgemarkets.com/article/cover-story-cost-raising-child-today/")),
                                 hr(style = "border-color:white;"),
                                 hr(),
                                 plotlyOutput("costGraph")),
-                       hr(style = "border-color:white;"),
-                       hr(style = "border-color:white;"),
-                       hr(strong("Information of Cost of Raising The Kids:")),
-                       raiseKidTab
+                       hr(style = "border-color:white;")
+                       
                        
                        # h5(strong("Estimated Cost of Raising A Child in Malaysia")),
                        # raiseKidC_table,
@@ -158,21 +160,34 @@ body <- dashboardBody(
         # Results
         tabItem(tabName = "result",
                 tabBox(title = strong("Result"),
-                       id = "tabE",height = "130em",width = "1em",
+                       id = "tabE",height = "150em",width = "1em",
                        tabPanel(
                            "",inflationRate,expenseGrowth,hr(),
                            resultbutton,
+                           textOutput(outputId = "run_result_status"),
                            hr(),
                            hr(style = "border-color:white;"),
-                           plotlyOutput("breakdownGraph"),
-                           hr(style = "border-color:white;"),
-                           hr(),
                            hr(style = "border-color:white;"),
                            plotlyOutput("ieGraph"),
                            hr(style = "border-color:white;"),
                            hr(),
                            hr(style = "border-color:white;"),
-                           plotlyOutput("networthGraph")
+                           plotlyOutput("networthGraph"),
+                           textOutput(outputId = "first_debt"),
+                           textOutput(outputId = "last_debt"),
+                           textOutput(outputId = "networth"),
+                           textOutput(outputId = "mspend"),
+                           hr(style = "border-color:white;"),
+                           hr(),
+                           fluidRow(
+                               column(width = 6,
+                                      numericInput(inputId = "result_selected_age",
+                                                   label=h5("Age (Years):"),
+                                                   value = 30,
+                                                   width = '20em')
+                               )),
+                           hr(style = "border-color:white;"),
+                           plotlyOutput("breakdownGraph")
                        ),
                        hr(style = "border-color:white;"),
                        hr(style = "border-color:white;")

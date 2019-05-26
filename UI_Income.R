@@ -87,7 +87,7 @@ ic_years_i <- fluidRow(
     column(width = 2,
            numericInput("range",
                         label=NULL,
-                        value = 50)
+                        value = 40)
     ))
 
 income_but <- fluidRow(

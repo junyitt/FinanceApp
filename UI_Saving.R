@@ -47,7 +47,7 @@ ic_years_s <- fluidRow(
     column(width = 2,
            numericInput("range_2",
                         label=NULL,
-                        value = 3)
+                        value = 35)
     ))
 
 saving_but <- fluidRow(

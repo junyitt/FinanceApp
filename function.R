@@ -1,6 +1,17 @@
 library(dplyr)
 
 generate_empty_age_df <- function(age_yr,duration,age_mth, add_column){
+    print(age_yr)
+    print(duration)
+    if(is.null(age_yr)){
+        age_yr <- 24
+    }
+    if(is.null(duration)){
+        duration <- 50
+    }
+    if(is.null(age_mth)){
+        age_mth <- 0
+    }
     age_Selected <- c(age_yr:(age_yr+duration))
     age_yrSelected <- c(rep(age_Selected[1],times=(12-age_mth)),
                         rep(age_Selected[2:length(age_Selected)],rep(12,(length(age_Selected)-1)))
@@ -114,7 +125,7 @@ monthly_saving_df_convert <- function(age, month, n, month_df){
     month_ot<- c(month:11,rep(c(0:11),(length(age_c)-1)))
     month_ot<-month_ot[1:(n*12)]
     proj <- month_df$Projection[1:length(month_ot)]
-    df <- data.frame(Age = age_ot, Month = month_ot, FDSavings = proj) %>% na.fill(0)
+    df <- data.frame(Age = age_ot, Month = month_ot, FDSavings = c(0,diff(proj))) %>% na.fill(0)
     return(df)
     
 }
@@ -129,7 +140,7 @@ yearly_saving_df_convert <- function(age, month, n, year_df){
     projections <- c(sapply(year_df$Projection, FUN = function(j){
         rep(j,12)
     }))[1:length(month_ot)]
-    df <- data.frame(Age = age_ot, Month = month_ot, FDSavings = projections) %>% na.fill(0)
+    df <- data.frame(Age = age_ot, Month = month_ot, FDSavings = c(0,diff(proj))) %>% na.fill(0)
     return(df)
     
 }

@@ -14,7 +14,7 @@ inflationRate <- fluidRow(
     column(width = 2,
            numericInput("inflationR",
                         label=NULL,
-                        value = 10)
+                        value = 3, step = 1)
     ))
 
 #Expenses growth
@@ -25,7 +25,7 @@ expenseGrowth <- fluidRow(
     column(width = 2,
            numericInput("expenseG",
                         label=NULL,
-                        value = 10)
+                        value = 0, step = 1)
     ))
 # Result
 resultbutton <- fluidRow(
